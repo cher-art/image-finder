@@ -7,45 +7,34 @@ import "../../node_modules/basiclightbox/dist/basicLightbox.min.css"
 
 
 refs.input.addEventListener('input',  
-  debounce( event => {
-    event.preventDefault();
-    refs.galleryList.innerHTML = '';
-    apiService.query = event.target.value;
-    refs.form.value = '';
-    renderApi();
-  },2000),
+debounce( event => {
+  event.preventDefault();
+  refs.galleryList.innerHTML = '';
+  apiService.query = event.target.value;
+  refs.form.value = '';
+  renderApi();
+},2000),
 );
 
 refs.galleryList.addEventListener('click', (e) => {
   
   if(e.target.nodeName === "IMG"){
-      let modalSrc = e.target.dataset.src
-      let openImage = document.querySelector(".js-modal-image")
-      const instance = basicLightbox.create(`
-      <div class="modal">
-      <img class = "js-modal-image" src = "${modalSrc}" alt = "" >
-      </div>`)
-      instance.show()
+    let openImage = document.querySelector(".js-modal-image")
+    let modalSrc = e.target.dataset.src
+    const instance = basicLightbox.create(`
+    <div class="modal">
+    <img class = "js-modal-image" src = "${modalSrc}" alt = "" >
+    </div>`)
+    instance.show()
   }
+  // modalSrc.dataset.index = e.target.dataset.index
   
   
 });
 
-
-
-
-const loadMoreBtn = document.createElement('button')
-loadMoreBtn.textContent = "Load more..."
-loadMoreBtn.classList.add('loadMore-button');
-
-loadMoreBtn.addEventListener('click', loadMore);
-
-
-
 function renderApi(){
   apiService.fetchImages().then(({hits}) => renderImages(hits));
 }
-
 
 function renderImages(data){
   const items = template(data)
@@ -58,10 +47,16 @@ function renderImages(data){
   }
 }
 
+const loadMoreBtn = document.createElement('button')
+loadMoreBtn.textContent = "Load more..."
+loadMoreBtn.classList.add('loadMore-button');
+
+loadMoreBtn.addEventListener('click', loadMore);
+
 function loadMore (){
-  // setTimeout()
   apiService.setPage();
-  apiService.fetchImages().then(({hits}) => renderImages(hits));
+  apiService.fetchImages()
+    .then(({hits}) => renderImages(hits));
 
   setTimeout(() => {
     window.scrollTo({
@@ -87,12 +82,12 @@ function loadMore (){
 
 // function setNewSrc (step, index){
 //   console.log(step);
-//   overlayImage.dataset.index = `${index + step}`
-//   overlayImage.src = gallery[index + step].image
+//   modalSrc.dataset.index = `${index + step}`
+//   modalSrc.src = gallery[index + step].image
 // }
 
 // function arrowLeft (){
-//   let index = +overlayImage.dataset.index
+//   let index = +modalSrc.dataset.index
 //   if(index === 0 ) {
 //     setNewSrc(0, gallery.length - 1)
 //     return
@@ -101,7 +96,7 @@ function loadMore (){
 
 // }
 // function arrowRight (){
-//   let index = +overlayImage.dataset.index
+//   let index = +modalSrc.dataset.index
 //   if (index === gallery.length - 1 ) {
 //     setNewSrc(0, 0)
 //     return
